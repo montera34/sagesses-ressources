@@ -38,10 +38,11 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 		}
  
 		$inscrits = get_post_meta($post->ID,'_atelier_inscrits',false);
+		$inscrits_presents = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
 		$choices = array();
  
 		foreach ( $inscrits as $i ) {
-		    $choices[] = array( 'text' => $i['user_email'], 'value' => $i['ID'] );
+			if ( array_search($i['ID'],array_column($inscrits_presents,'ID')) === FALSE ) $choices[] = array( 'text' => $i['user_email'], 'value' => $i['ID'] );
 		}
  
 		$field->placeholder = __('Select your email address','sgs_ressources');
@@ -51,7 +52,7 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 
 }
 
-// ADD FORM TO ATELIER SINGLE PAGE
+// ADD FORM TO ATELIER SINGLE
 // https://docs.gravityforms.com/embedding-a-form/
 add_filter('the_content','sgs_ressources_atelier_add_form');
 function sgs_ressources_atelier_add_form($content) {
@@ -60,6 +61,19 @@ function sgs_ressources_atelier_add_form($content) {
 	if ( get_post_type($post) == $workshop_pt ) {
 		$content .= gravity_form( '1', true, true, false, null, false, '', false );
 	}
+	$cf = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
 	return $content;
+}
+
+// UPDATE ATELIER INSCRITS META FIELD
+add_action("gform_after_submission_1", "sgs_ressources_atelier_inscrits_presents_update", 10, 2);
+function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
+
+	$p = get_post( $entry['post_id'] );
+	$cf = get_post_meta($p->ID,'_atelier_inscrits_presents',false);
+	if ( is_array($cf) ) $nf = array_column($cf,'ID');
+	$nf[] = $entry['1'];
+	update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
+
 }
 ?>
