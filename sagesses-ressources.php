@@ -15,11 +15,14 @@ Domain Path: /lang/
 $workshop_pt = 'atelier';
 
 
+// PAGE TEMPLATES CREATOR
+include("includes/pagetemplater/pagetemplater.php");
+
 // LOAD PLUGIN TEXT DOMAIN
 // FOR STRING TRANSLATIONS
 add_action( 'plugins_loaded', 'sgs_ressources_load_textdomain' );
 function sgs_ressources_load_textdomain() {
-	load_plugin_textdomain( 'sgs-emails', false, plugin_basename( dirname( __FILE__ ) ) . '/lang/' ); 
+	load_plugin_textdomain( 'sgs-ressources', false, plugin_basename( dirname( __FILE__ ) ) . '/lang/' ); 
 }
 
 // POPULATE DROPDOWN FIELD DYNAMICALLY
@@ -30,6 +33,7 @@ add_filter( 'gform_pre_submission_filter_1', 'sgs_ressources_gform_populate_insc
 add_filter( 'gform_admin_pre_render_1', 'sgs_ressources_gform_populate_inscrits' );
 function sgs_ressources_gform_populate_inscrits( $form ) {
  
+	if ( is_single() ) {
 	global $post;
 	foreach ( $form['fields'] as &$field ) {
  
@@ -48,6 +52,7 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 		$field->placeholder = __('Select your email address','sgs_ressources');
 		$field->choices = $choices;
 	}
+	}
 	return $form;
 
 }
@@ -61,11 +66,11 @@ function sgs_ressources_atelier_add_form($content) {
 	if ( get_post_type($post) == $workshop_pt ) {
 		$content .= gravity_form( '1', true, true, false, null, false, '', false );
 	}
-	$cf = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
 	return $content;
 }
 
 // UPDATE ATELIER INSCRITS META FIELD
+// https://docs.gravityforms.com/gform_after_submission/#1-update-post
 add_action("gform_after_submission_1", "sgs_ressources_atelier_inscrits_presents_update", 10, 2);
 function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 
