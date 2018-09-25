@@ -1,7 +1,7 @@
 <?php
 /*
- * Template Name: Good to Be Bad
- * Description: A Page Template with a darker design.
+ * Template Name: Ressources home page
+ * Description: Home page for activezvosressources.tools
  */
 
-echo '<iframe width="1280" height="720" src="//www.youtube.com/embed/2Bls1KKDwmo" frameborder="0" allowfullscreen></iframe>';
+get_template_part( 'page' );
