@@ -58,15 +58,52 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 
 }
 
-// ADD FORM TO ATELIER SINGLE
+// ADD EXTRA CONTENT TO ATELIER SINGLE
+// + confirmation form
+// + workshop metadata
+// + list of registered and present people
 // https://docs.gravityforms.com/embedding-a-form/
-add_filter('the_content','sgs_ressources_atelier_add_form');
+add_filter('the_content','sgs_ressources_atelier_add_form',10);
+add_filter('the_content','sgs_ressources_atelier_add_extra_data',5);
 function sgs_ressources_atelier_add_form($content) {
 	global $post;
 	global $workshop_pt;
-	if ( get_post_type($post) == $workshop_pt && is_single() ) {
-		$content .= gravity_form( '1', true, true, false, null, false, '', false );
+	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
+
+	$content .= gravity_form( '1', true, true, false, null, false, '', false );
+
+	return $content;
+}
+
+function sgs_ressources_atelier_add_extra_data($content) {
+	global $post;
+	global $workshop_pt;
+	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
+
+	$a_perma = get_permalink($post->ID);
+	$a_date = get_post_meta($post->ID,'_atelier_date',true);
+	$a_time = get_post_meta($post->ID,'_atelier_heure',true);
+	$a_time_end = get_post_meta($post->ID,'_atelier_heure_fin',true);
+	$a_registered = get_post_meta($post->ID,'_atelier_inscrits',false);
+	$ar_count = ( $a_registered[0] === FALSE ) ? 0 : count($a_registered);
+	$a_present = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
+	$ap_count = ( $a_present[0] === FALSE ) ? 0 : count($a_present);
+	$ar_items = '';
+	foreach ( $a_registered as $ar ) {
+		$ar_items .= ( array_search($ar['ID'],array_column($a_present,'ID')) === FALSE ) ? '<li class="inscrit inscrit-non-confirmed">'.$ar['display_name'].' ('.$ar['user_email'].')</li>' : '<li class="inscrit-confirmed"><em>'.$ar['display_name'].' ('.$ar['user_email'].') '.__('Confirmed','sgs_ressources').'</em></li>';
 	}
+	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : '';
+
+	$a_meta = '
+	<dl class="workshop workshop-meta">
+		<dt>'.__("Date","sgs_ressources").'</dt><dd>'.$a_date.'</dd>
+		<dt>'.__("Time","sgs_ressources").'</dt><dd>'.$a_time.' &dash; '.$a_time_end.'</dd>
+	</dl>
+	';
+	$ar_out = '
+	<h2>'.__("Registered people","sgs_ressources").'</h2>'.$ar_list;
+	$content = $a_meta.$content.$ar_out;
+
 	return $content;
 }
 
@@ -141,13 +178,13 @@ function sgs_ressources_atelier_list($content) {
 		</tr></thead>
 	';
 	$a_table = ( $a_rows != "" ) ? '
-	<table>
+	<table class="workshop-list workshop-list-current">
 		'.$a_head.'
 		<tbody>'.$a_rows.'</tbody></table>
 	' : '';
 	$ap_table = ( $ap_rows != "" ) ? '
 	<h2>'.__('Past workshops','sgs_ressources').'</h2>
-	<table>
+	<table class="workshop-list workshop-list-past">
 		'.$a_head.'
 		<tbody>'.$a_rows.'</tbody></table>
 	' : '';
