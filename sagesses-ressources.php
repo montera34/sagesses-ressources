@@ -27,6 +27,43 @@ function sgs_ressources_load_textdomain() {
 }
 
 // POPULATE DROPDOWN FIELD DYNAMICALLY
+// with users with subscriber role
+add_filter( 'gform_pre_render_2', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_pre_validation_2', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_pre_submission_filter_2', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_admin_pre_render_2', 'sgs_ressources_gform_populate_users_subscribers' );
+function sgs_ressources_gform_populate_users_subscribers( $form ) {
+ 
+	if ( is_single() ) {
+	global $post;
+	foreach ( $form['fields'] as &$field ) {
+ 
+		if ( $field->type != 'select' || strpos( $field->cssClass, 'populate-users' ) === false ) {
+		    continue;
+		}
+ 		
+		$args = array(
+			'blog_id' => '2',
+			'role' => 'subscriber',
+			'number' => -1
+		);
+		$users = get_users($args);
+		$choices = array();
+ 
+		foreach ( $users as $u ) {
+			$choices[] = array( 'text' => $u->user_email, 'value' => $u->ID );
+		}
+ 
+		$field->placeholder = __('Select your email address','sgs_ressources');
+		$field->choices = $choices;
+	}
+	}
+	return $form;
+
+}
+
+// POPULATE DROPDOWN FIELD DYNAMICALLY
+// with subscribers to a workshop
 // https://docs.gravityforms.com/dynamically-populating-drop-down-fields/
 add_filter( 'gform_pre_render_1', 'sgs_ressources_gform_populate_inscrits' );
 add_filter( 'gform_pre_validation_1', 'sgs_ressources_gform_populate_inscrits' );
@@ -62,9 +99,11 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 // + confirmation form
 // + workshop metadata
 // + list of registered and present people
+// + subscription form
 // https://docs.gravityforms.com/embedding-a-form/
-add_filter('the_content','sgs_ressources_atelier_add_form',10);
 add_filter('the_content','sgs_ressources_atelier_add_extra_data',5);
+add_filter('the_content','sgs_ressources_atelier_subscription_form',7);
+add_filter('the_content','sgs_ressources_atelier_add_form',10);
 function sgs_ressources_atelier_add_form($content) {
 	global $post;
 	global $workshop_pt;
@@ -107,16 +146,55 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	return $content;
 }
 
+function sgs_ressources_atelier_subscription_form($content) {
+	global $post;
+	global $workshop_pt;
+	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
+
+	$content .= gravity_form( '2', true, true, false, null, false, '', false );
+
+	return $content;
+
+}
+
 // UPDATE ATELIER INSCRITS META FIELD
 // https://docs.gravityforms.com/gform_after_submission/#1-update-post
 add_action("gform_after_submission_1", "sgs_ressources_atelier_inscrits_presents_update", 10, 2);
 function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
-
+	
+	$i_id = $entry['1'];
 	$p = get_post( $entry['post_id'] );
 	$cf = get_post_meta($p->ID,'_atelier_inscrits_presents',false);
 	if ( is_array($cf) ) $nf = array_column($cf,'ID');
-	$nf[] = $entry['1'];
-	update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
+	$nf[] = $i_id;
+	$nf_control = update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
+
+	// send mail
+//	if ( $nf_control != 1 ) { echo "Error. Try again."; return; }
+//	$i_mail = get_user($i_id);
+//	$send_control = sgs_ressources_atelier_list($i_email,$a);
+//	if ( $send_control != 1 ) { echo "Error. Try again."; return; }
+}
+
+// DO NEW SUBSCIPTION
+// to a workshop
+// https://docs.gravityforms.com/gform_after_submission/#1-update-post
+add_action("gform_after_submission_2", "sgs_ressources_atelier_subscription", 99, 2);
+function sgs_ressources_atelier_subscription($entry, $form) {
+	
+	if ( $entry['7'] != '' ) {
+		$i_id =  $entry['7'];
+
+	} else {
+		$user = get_user_by( 'email', $entry['4'] );
+		$i_id =  $user->ID;
+;
+	}
+	$p = get_post( $entry['post_id'] );
+	$cf = get_post_meta($p->ID,'_atelier_inscrits',false);
+	if ( is_array($cf) ) $nf = array_column($cf,'ID');
+	$nf[] = $i_id;
+	$nf_control = update_post_meta($p->ID, '_atelier_inscrits', $nf );
 
 }
 
@@ -192,4 +270,20 @@ function sgs_ressources_atelier_list($content) {
 	$content .= $a_table.$ap_table;
 	return $content;
 }
+
+// SEND WORKSHOP INFO BY MAIL
+// to people registered to workshop
+//function sgs_ressources_send_mail($email_address,$workshop) {
+//	$from = 'ressources@activezvosressources.tools';
+//	$from_name = 'Activez vos ressources';
+//	$replyto = 'info@activezvosressources.tools';
+//	$replyto_name = 'Sagesses';
+//	$to = $email_address;
+//	$subject = __('Workshop documents','sgs_ressources');
+//
+//	$docs = array();
+//	$sent = wp_mail( $to, $subject, $body);
+//	return $sent;
+//}
+
 ?>
