@@ -1,0 +1,144 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: sgs_emails\n"
+"POT-Creation-Date: 2018-09-28 02:01+0200\n"
+"PO-Revision-Date: 2018-09-28 02:04+0200\n"
+"Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
+"Language-Team: Montera34\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-KeywordsList: __;_e;_x\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: languages\n"
+"X-Poedit-SearchPathExcluded-1: .git\n"
+
+#: includes/pagetemplater/pagetemplater.php:73
+msgid "Ressources home page"
+msgstr "Accueil"
+
+#: sagesses-ressources.php:57 sagesses-ressources.php:90
+msgid "Select your email address"
+msgstr "Choisissez votre adresse émail"
+
+#: sagesses-ressources.php:132
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#: sagesses-ressources.php:138 sagesses-ressources.php:252
+msgid "Date"
+msgstr "Date"
+
+#: sagesses-ressources.php:139 sagesses-ressources.php:253
+msgid "Time"
+msgstr "Heure"
+
+#: sagesses-ressources.php:143 sagesses-ressources.php:254
+msgid "Registered people"
+msgstr "Personnes inscrites"
+
+#: sagesses-ressources.php:251
+msgid "Workshop"
+msgstr "Atelier"
+
+#: sagesses-ressources.php:255
+msgid "Present people"
+msgstr "Personnes présentes"
+
+#: sagesses-ressources.php:264
+msgid "Past workshops"
+msgstr "Ateliers finalisés"
+
+#~ msgid "You are invited to do this right now:"
+#~ msgstr "Vous êtes invité(e) à appliquer à l’instant:"
+
+#~ msgid "You can unsuscribe from this newsletter when you want: just send an email to ccilica@gmail.com"
+#~ msgstr "À tout moment vous pouvez arrêter l'envoi de ces rappels, en le demandant par mail à ccilica@gmail.com"
+
+#~ msgid "Sagesses Email plugin size"
+#~ msgstr "Taille du module Sagesses émail"
+
+#~ msgid "Sagesses emails"
+#~ msgstr "Sagesses emails"
+
+#~ msgid "Post type"
+#~ msgstr "Type de contenu"
+
+#~ msgid "Post type for email content"
+#~ msgstr "Type de contenu pour les emails"
+
+#~ msgid "Send probability"
+#~ msgstr "Probabilité d'envoi"
+
+#~ msgid "Probability"
+#~ msgstr "Probabilité"
+
+#~ msgid "Subjects"
+#~ msgstr "Objets"
+
+#~ msgid "List of subjects"
+#~ msgstr "Liste d'objets"
+
+#~ msgid "Addresses"
+#~ msgstr "Adresses"
+
+#~ msgid "List of addresses"
+#~ msgstr "Liste d'adresses"
+
+#~ msgid "Email headers"
+#~ msgstr "En-têtes des emails"
+
+#~ msgid "From field (email address)"
+#~ msgstr "From (émail adresse)"
+
+#~ msgid "From field (name)"
+#~ msgstr "From (nom)"
+
+#~ msgid "Reply-to field (email address)"
+#~ msgstr "Reply-to (émail adresse)"
+
+#~ msgid "Reply-to field (name)"
+#~ msgstr "Reply-to (nom)"
+
+#~ msgid "Choose a post type to feed the emails with content."
+#~ msgstr "Choisissez un type de contenu pour montrer de contenu dans les emails."
+
+#~ msgid "Choose the probability to send emails at each send time."
+#~ msgstr "Choisir la probabilité d'envoi d'émails à chaque envoi."
+
+#~ msgid "0% - Sends are halted"
+#~ msgstr "0% - Les envois sont arrêtés"
+
+#~ msgid "25%"
+#~ msgstr "25%"
+
+#~ msgid "33%"
+#~ msgstr "33%"
+
+#~ msgid "50%"
+#~ msgstr "50%"
+
+#~ msgid "66%"
+#~ msgstr "66%"
+
+#~ msgid "100%"
+#~ msgstr "100%"
+
+#~ msgid "List of subjects for emails. When an email is sent, its subject will be chosen randomly from this list."
+#~ msgstr "Liste d'objets pour les emails. Quand un email est envoyé, l'objet sera choisi d'une façon aléatoire."
+
+#~ msgid "List of addresses to send emails to."
+#~ msgstr "Liste de destinataires."
+
+#~ msgid "Headers for outgoing emails sent by this plugin."
+#~ msgstr "En-têtes pour les email envoyés par ce module."
+
+#~ msgid "Sagesses send emails tool"
+#~ msgstr "Outil de Sagesses pour l'envoi des emails"
+
+#~ msgid "Image"
+#~ msgstr "Image"
