@@ -54,7 +54,7 @@ function sgs_ressources_gform_populate_users_subscribers( $form ) {
 			$choices[] = array( 'text' => $u->user_email, 'value' => $u->ID );
 		}
  
-		$field->placeholder = __('Select your email address','sgs_ressources');
+		$field->placeholder = __('Select your email address','sgs-ressources');
 		$field->choices = $choices;
 	}
 	}
@@ -87,7 +87,7 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 			if ( array_search($i['ID'],array_column($inscrits_presents,'ID')) === FALSE ) $choices[] = array( 'text' => $i['user_email'], 'value' => $i['ID'] );
 		}
  
-		$field->placeholder = __('Select your email address','sgs_ressources');
+		$field->placeholder = __('Select your email address','sgs-ressources');
 		$field->choices = $choices;
 	}
 	}
@@ -129,18 +129,18 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	$ap_count = ( $a_present[0] === FALSE ) ? 0 : count($a_present);
 	$ar_items = '';
 	foreach ( $a_registered as $ar ) {
-		$ar_items .= ( array_search($ar['ID'],array_column($a_present,'ID')) === FALSE ) ? '<li class="inscrit inscrit-non-confirmed">'.$ar['display_name'].' ('.$ar['user_email'].')</li>' : '<li class="inscrit-confirmed"><em>'.$ar['display_name'].' ('.$ar['user_email'].') '.__('Confirmed','sgs_ressources').'</em></li>';
+		$ar_items .= ( array_search($ar['ID'],array_column($a_present,'ID')) === FALSE ) ? '<li class="inscrit inscrit-non-confirmed">'.$ar['display_name'].' ('.$ar['user_email'].')</li>' : '<li class="inscrit-confirmed"><em>'.$ar['display_name'].' ('.$ar['user_email'].') '.__('Confirmed','sgs-ressources').'</em></li>';
 	}
 	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : '';
 
 	$a_meta = '
 	<dl class="workshop workshop-meta">
-		<dt>'.__("Date","sgs_ressources").'</dt><dd>'.$a_date.'</dd>
-		<dt>'.__("Time","sgs_ressources").'</dt><dd>'.$a_time.' &dash; '.$a_time_end.'</dd>
+		<dt>'.__("Date","sgs-ressources").'</dt><dd>'.$a_date.'</dd>
+		<dt>'.__("Time","sgs-ressources").'</dt><dd>'.$a_time.' &dash; '.$a_time_end.'</dd>
 	</dl>
 	';
 	$ar_out = '
-	<h2>'.__("Registered people","sgs_ressources").'</h2>'.$ar_list;
+	<h2>'.__("Registered people","sgs-ressources").'</h2>'.$ar_list;
 	$content = $a_meta.$content.$ar_out;
 
 	return $content;
@@ -248,11 +248,11 @@ function sgs_ressources_atelier_list($content) {
 	}
 	$a_head = '
 		<thead><tr>
-			<th>'.__("Workshop","sgs_ressources").'</th>
-			<th>'.__("Date","sgs_ressources").'</th>
-			<th>'.__("Time","sgs_ressources").'</th>
-			<th>'.__("Registered people","sgs_ressources").'</th>
-			<th>'.__("Present people","sgs_ressources").'</th>
+			<th>'.__("Workshop","sgs-ressources").'</th>
+			<th>'.__("Date","sgs-ressources").'</th>
+			<th>'.__("Time","sgs-ressources").'</th>
+			<th>'.__("Registered people","sgs-ressources").'</th>
+			<th>'.__("Present people","sgs-ressources").'</th>
 		</tr></thead>
 	';
 	$a_table = ( $a_rows != "" ) ? '
@@ -261,7 +261,7 @@ function sgs_ressources_atelier_list($content) {
 		<tbody>'.$a_rows.'</tbody></table>
 	' : '';
 	$ap_table = ( $ap_rows != "" ) ? '
-	<h2>'.__('Past workshops','sgs_ressources').'</h2>
+	<h2>'.__('Past workshops','sgs-ressources').'</h2>
 	<table class="workshop-list workshop-list-past">
 		'.$a_head.'
 		<tbody>'.$a_rows.'</tbody></table>
@@ -279,7 +279,7 @@ function sgs_ressources_atelier_list($content) {
 //	$replyto = 'info@activezvosressources.tools';
 //	$replyto_name = 'Sagesses';
 //	$to = $email_address;
-//	$subject = __('Workshop documents','sgs_ressources');
+//	$subject = __('Workshop documents','sgs-ressources');
 //
 //	$docs = array();
 //	$sent = wp_mail( $to, $subject, $body);
