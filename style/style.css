@@ -1,0 +1,22 @@
+.alert-warning {
+	background-color: #fff3cd;
+	color: #856404;
+	padding: 20px;
+}
+.gform_confirmation_wrapper {
+	background-color: #d4edda;
+	padding: 20px;
+}
+.gform_confirmation_message {
+	background-color: #fff;
+	color: #155724;
+	padding: 20px;
+}
+.gform_wrapper {
+	background-color: #f2f2f2;
+	padding: 20px;
+}
+.gform_footer p {
+	margin: 0;
+	height: 0;
+}

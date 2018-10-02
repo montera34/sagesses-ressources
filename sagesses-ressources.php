@@ -26,6 +26,12 @@ function sgs_ressources_load_textdomain() {
 	load_plugin_textdomain( 'sgs-ressources', false, plugin_basename( dirname( __FILE__ ) ) . '/lang/' ); 
 }
 
+// REGISTER AND LOAD STYLES
+add_action( 'wp_enqueue_scripts', 'sgs_ressources_register_load_styles' );
+function sgs_ressources_register_load_styles() {
+	wp_enqueue_style( 'sgs-ressources-css',plugins_url( 'style/style.css' , __FILE__) );
+
+} // end register load map styles
 /**
  * New user registrations should have display_name set 
  * to 'firstname lastname'. This is best used on the
@@ -121,8 +127,8 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 // + subscription form
 // https://docs.gravityforms.com/embedding-a-form/
 add_filter('the_content','sgs_ressources_atelier_add_extra_data',5);
-add_filter('the_content','sgs_ressources_atelier_subscription_form',7);
-add_filter('the_content','sgs_ressources_atelier_add_form',10);
+add_filter('the_content','sgs_ressources_atelier_subscription_form',10);
+add_filter('the_content','sgs_ressources_atelier_add_form',7);
 function sgs_ressources_atelier_add_form($content) {
 	global $post;
 	global $workshop_pt;
@@ -152,6 +158,7 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	}
 	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : '';
 
+	$a_signup_form_perma = "#gform_wrapper_2";
 	$a_meta = '
 	<dl class="workshop workshop-meta">
 		<dt>'.__("Date","sgs-ressources").'</dt><dd>'.$a_date.'</dd>
@@ -159,7 +166,10 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	</dl>
 	';
 	$ar_out = '
-	<h2>'.__("Registered people","sgs-ressources").'</h2>'.$ar_list;
+	<h2>'.__("Registered people","sgs-ressources").'</h2>'
+	.$ar_list.
+	'<p class="alert-warning">'.sprintf(__("If you are not in the list above, <a href='%s'>sign up for this workshop</a>.","sgs-ressources"),$a_signup_form_perma).'</p>
+	';
 	$content = $a_meta.$content.$ar_out;
 
 	return $content;

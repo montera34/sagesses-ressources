@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_ressources\n"
-"POT-Creation-Date: 2018-09-28 02:14+0200\n"
-"PO-Revision-Date: 2018-09-28 02:14+0200\n"
+"POT-Creation-Date: 2018-10-02 22:28+0200\n"
+"PO-Revision-Date: 2018-10-02 22:29+0200\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
@@ -21,35 +21,40 @@ msgstr ""
 msgid "Ressources home page"
 msgstr "Accueil"
 
-#: sagesses-ressources.php:57 sagesses-ressources.php:90
+#: sagesses-ressources.php:82 sagesses-ressources.php:115
 msgid "Select your email address"
 msgstr "Choisissez votre adresse émail"
 
-#: sagesses-ressources.php:132
+#: sagesses-ressources.php:157
 msgid "Confirmed"
 msgstr "Confirmé"
 
-#: sagesses-ressources.php:138 sagesses-ressources.php:252
+#: sagesses-ressources.php:164 sagesses-ressources.php:280
 msgid "Date"
 msgstr "Date"
 
-#: sagesses-ressources.php:139 sagesses-ressources.php:253
+#: sagesses-ressources.php:165 sagesses-ressources.php:281
 msgid "Time"
 msgstr "Heure"
 
-#: sagesses-ressources.php:143 sagesses-ressources.php:254
+#: sagesses-ressources.php:167
+#, php-format
+msgid "If you are not in the list above, <a href='%s'>sign up for this workshop</a>."
+msgstr "Si vous n'êtes pas dans la liste d'inscrits, <a href='%s'>inscrivez vous à l'atelier</a>."
+
+#: sagesses-ressources.php:171 sagesses-ressources.php:282
 msgid "Registered people"
 msgstr "Personnes inscrites"
 
-#: sagesses-ressources.php:251
+#: sagesses-ressources.php:279
 msgid "Workshop"
 msgstr "Atelier"
 
-#: sagesses-ressources.php:255
+#: sagesses-ressources.php:283
 msgid "Present people"
 msgstr "Personnes présentes"
 
-#: sagesses-ressources.php:264
+#: sagesses-ressources.php:292
 msgid "Past workshops"
 msgstr "Ateliers finalisés"
 
