@@ -26,6 +26,25 @@ function sgs_ressources_load_textdomain() {
 	load_plugin_textdomain( 'sgs-ressources', false, plugin_basename( dirname( __FILE__ ) ) . '/lang/' ); 
 }
 
+/**
+ * New user registrations should have display_name set 
+ * to 'firstname lastname'. This is best used on the
+ * 'user_register' action.
+ *
+ * @param int $user_id The user ID
+ */
+add_action( 'user_register', 'sgs_ressourcesset_default_user_config' );
+function sgs_ressourcesset_default_user_config( $user_id ) {
+	$user = get_userdata( $user_id );
+	$name = sprintf( '%s %s', $user->first_name, $user->last_name );
+	$args = array(
+		'ID' => $user_id,
+		'display_name' => $name,
+		'nickname' => $name
+	);
+	wp_update_user( $args );
+}
+
 // POPULATE DROPDOWN FIELD DYNAMICALLY
 // with users with subscriber role
 add_filter( 'gform_pre_render_2', 'sgs_ressources_gform_populate_users_subscribers' );
@@ -264,7 +283,7 @@ function sgs_ressources_atelier_list($content) {
 	<h2>'.__('Past workshops','sgs-ressources').'</h2>
 	<table class="workshop-list workshop-list-past">
 		'.$a_head.'
-		<tbody>'.$a_rows.'</tbody></table>
+		<tbody>'.$ap_rows.'</tbody></table>
 	' : '';
 
 	$content .= $a_table.$ap_table;
