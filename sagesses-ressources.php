@@ -68,7 +68,7 @@ function sgs_ressources_gform_populate_users_subscribers( $form ) {
 		}
  		
 		$args = array(
-			'blog_id' => '2',
+			'blog_id' => get_current_blog_id(),
 			'role' => 'subscriber',
 			'number' => -1
 		);
@@ -76,7 +76,7 @@ function sgs_ressources_gform_populate_users_subscribers( $form ) {
 		$choices = array();
  
 		foreach ( $users as $u ) {
-			$choices[] = array( 'text' => $u->user_email, 'value' => $u->ID );
+			$choices[] = array( 'text' => $u->display_name.' ('.$u->user_email.')', 'value' => $u->ID );
 		}
  
 		$field->placeholder = __('Select your email address','sgs-ressources');
@@ -145,9 +145,20 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
 
 	$a_perma = get_permalink($post->ID);
+	$a_signup_form_perma = "#gform_wrapper_2";
 	$a_date = get_post_meta($post->ID,'_atelier_date',true);
 	$a_time = get_post_meta($post->ID,'_atelier_heure',true);
 	$a_time_end = get_post_meta($post->ID,'_atelier_heure_fin',true);
+	// Docs
+	$a_docs = get_post_meta($post->ID,'_atelier_documents',false);
+	$ad_items = array();
+	foreach ( $a_docs as $d ) {
+		$d_title = $d['post_title'];
+		$d_archive = get_post_meta($d['ID'],'_doc_archive',true);
+		$ad_items[] = '<a href="'.$d_archive['guid'].'">'.$d_title.'</a>';
+	}
+	$a_docs_list = implode(', ',$ad_items);
+	// Registered users
 	$a_registered = get_post_meta($post->ID,'_atelier_inscrits',false);
 	$ar_count = ( $a_registered[0] === FALSE ) ? 0 : count($a_registered);
 	$a_present = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
@@ -158,11 +169,11 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	}
 	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : '';
 
-	$a_signup_form_perma = "#gform_wrapper_2";
 	$a_meta = '
 	<dl class="workshop workshop-meta">
 		<dt>'.__("Date","sgs-ressources").'</dt><dd>'.$a_date.'</dd>
 		<dt>'.__("Time","sgs-ressources").'</dt><dd>'.$a_time.' &dash; '.$a_time_end.'</dd>
+		<dt>'.__("Documents","sgs-ressources").'</dt><dd>'.$a_docs_list.'</dd>
 	</dl>
 	';
 	$ar_out = '
