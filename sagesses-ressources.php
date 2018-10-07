@@ -32,6 +32,7 @@ function sgs_ressources_register_load_styles() {
 	wp_enqueue_style( 'sgs-ressources-css',plugins_url( 'style/style.css' , __FILE__) );
 
 } // end register load map styles
+
 /**
  * New user registrations should have display_name set 
  * to 'firstname lastname'. This is best used on the
@@ -207,13 +208,15 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 	$cf = get_post_meta($p->ID,'_atelier_inscrits_presents',false);
 	if ( is_array($cf) ) $nf = array_column($cf,'ID');
 	$nf[] = $i_id;
-	$nf_control = update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
 
 	// send mail
-//	if ( $nf_control != 1 ) { echo "Error. Try again."; return; }
-//	$i_mail = get_user($i_id);
-//	$send_control = sgs_ressources_atelier_list($i_email,$a);
-//	if ( $send_control != 1 ) { echo "Error. Try again."; return; }
+	$i = get_user_by('ID',$i_id);
+	$send_control = sgs_ressources_send_mail($i,$p);
+	if ( $send_control != 1 ) {
+		echo "Error: no mail sent. Try again."; return;
+	} else {
+		update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
+	}
 }
 
 // DO NEW SUBSCIPTION
@@ -313,17 +316,39 @@ function sgs_ressources_atelier_list($content) {
 
 // SEND WORKSHOP INFO BY MAIL
 // to people registered to workshop
-//function sgs_ressources_send_mail($email_address,$workshop) {
-//	$from = 'ressources@activezvosressources.tools';
-//	$from_name = 'Activez vos ressources';
-//	$replyto = 'info@activezvosressources.tools';
-//	$replyto_name = 'Sagesses';
-//	$to = $email_address;
-//	$subject = __('Workshop documents','sgs-ressources');
-//
-//	$docs = array();
-//	$sent = wp_mail( $to, $subject, $body);
-//	return $sent;
-//}
+function sgs_ressources_send_mail($user,$workshop) {
+	$nl = "\r\n\r\n";
+
+	// headers
+	$from_name = 'Activez vos ressources (Sagesses)';
+	$headers[] = "From: ".$from_name." <ressources@activezvosressources.tools>".$nl;
+	$replyto_name = 'Sagesses';
+	$headers[] = "Reply-To: ".$replyto_name." <info@activezvosressources.tools>".$nl;
+
+	// to
+	$to = $user->user_email;
+	// subject
+	$subject = sprintf(__('Documents of the workshop %s','sgs-ressources'),$workshop->post_title);
+	// body
+	$a_docs = get_post_meta($workshop->ID,'_atelier_documents',false);
+	$a_docs_out = "";
+	$count = 0;
+	foreach ( $a_docs as $d ) {
+		$count++;
+		$d_title = $d['post_title'];
+		$d_archive = get_post_meta($d['ID'],'_doc_archive',true);
+		$a_docs_out .= $count."/ ".$d_title.": ".$d_archive['guid'].$nl;
+	}
+	$body = sprintf(__("Hi %s,","sgs-ressources"),$user->display_name).$nl;
+	$body .= sprintf(__("here you have the documents related to the workshop '%s' you have completed recently.","sgs-ressources"),$workshop->post_title).$nl;
+	$body .= sprintf(__("Click in the links to download the documents:","sgs-ressources"),$workshop->post_title).$nl;
+	$body .= $a_docs_out.$nl;
+	$body .= __("Copy the link and paste it in your browser if you have any problem reaching the document.","sgs-ressources").$nl;
+	$body .= __("Thanks for participate in the workshop.","sgs-ressources").$nl;
+	$body .= "Cilica Chlimper";
+
+	$sent = wp_mail( $to, $subject, $body, $headers );
+	return $sent;
+}
 
 ?>
