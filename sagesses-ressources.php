@@ -213,7 +213,8 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 	$nf[] = $i_id;
 
 	// subscription to suspension
-	if ( get_post_meta( $p->ID,'_atelier_suspension',true) == 1 ) {
+	$suspenssion = get_post_meta( $p->ID,'_atelier_suspension',true);
+	if ( $suspenssion == 1 ) {
 		$suspension_control = sgs_ressources_suspension($i);
 	} else {
 		$suspension_control = 1;
