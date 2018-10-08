@@ -165,10 +165,12 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	$a_present = get_post_meta($post->ID,'_atelier_inscrits_presents',false);
 	$ap_count = ( $a_present[0] === FALSE ) ? 0 : count($a_present);
 	$ar_items = '';
-	foreach ( $a_registered as $ar ) {
-		$ar_items .= ( array_search($ar['ID'],array_column($a_present,'ID')) === FALSE ) ? '<li class="inscrit inscrit-non-confirmed">'.$ar['display_name'].' ('.$ar['user_email'].')</li>' : '<li class="inscrit-confirmed"><em>'.$ar['display_name'].' ('.$ar['user_email'].') '.__('Confirmed','sgs-ressources').'</em></li>';
+	if ( $ar_count != 0 ) {
+		foreach ( $a_registered as $ar ) {
+			$ar_items .= ( array_search($ar['ID'],array_column($a_present,'ID')) === FALSE ) ? '<li class="inscrit inscrit-non-confirmed">'.$ar['display_name'].' ('.$ar['user_email'].')</li>' : '<li class="inscrit-confirmed"><em>'.$ar['display_name'].' ('.$ar['user_email'].') '.__('Confirmed','sgs-ressources').'</em></li>';
+		}
 	}
-	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : '';
+	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : __('No registered people.','sgs-ressources');
 
 	$a_meta = '
 	<dl class="workshop workshop-meta">
@@ -204,18 +206,26 @@ add_action("gform_after_submission_1", "sgs_ressources_atelier_inscrits_presents
 function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 	
 	$i_id = $entry['1'];
+	$i = get_user_by('ID',$i_id);
 	$p = get_post( $entry['post_id'] );
 	$cf = get_post_meta($p->ID,'_atelier_inscrits_presents',false);
 	if ( is_array($cf) ) $nf = array_column($cf,'ID');
 	$nf[] = $i_id;
 
+	// subscription to suspension
+	if ( get_post_meta( $p->ID,'_atelier_suspension',true) == 1 ) {
+		$suspension_control = sgs_ressources_suspension($i);
+	} else {
+		$suspension_control = 1;
+	}
 	// send mail
-	$i = get_user_by('ID',$i_id);
 	$send_control = sgs_ressources_send_mail($i,$p);
-	if ( $send_control != 1 ) {
-		echo "Error: no mail sent. Try again."; return;
+	$send_control = 1;
+	if ( $send_control != 1 || $suspension_control != 1 ) {
+		echo "Error: no mail sent or suspension subscription failed. Try again."; return;
 	} else {
 		update_post_meta($p->ID, '_atelier_inscrits_presents', $nf );
+		return;
 	}
 }
 
@@ -351,4 +361,23 @@ function sgs_ressources_send_mail($user,$workshop) {
 	return $sent;
 }
 
+// SUBSCRIPTION TO SUSPENSION
+// to people registered to workshop
+function sgs_ressources_suspension($user) {
+	$settings = (array) get_option('sgs_emails_settings');
+	if ( array_search($user->user_email,$settings['sgs_emails_settings_addresses']) === FALSE ) {
+		$a = 0;
+		while ( $a < count($settings['sgs_emails_settings_addresses']) - 1 ) {
+			if ( $settings['sgs_emails_settings_addresses'][$a] == '') {
+				$settings['sgs_emails_settings_addresses'][$a] = $user->user_email;
+				break;
+			}
+			$a++;
+		}
+		return update_option('sgs_emails_settings',$settings);
+	} else {
+		// the address is already subscribed to suspension
+		return 1;
+	}
+}
 ?>
