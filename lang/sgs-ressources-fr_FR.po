@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_ressources\n"
-"POT-Creation-Date: 2018-10-07 21:57+0200\n"
-"PO-Revision-Date: 2018-10-07 22:35+0200\n"
+"POT-Creation-Date: 2018-10-11 10:25+0200\n"
+"PO-Revision-Date: 2018-10-11 10:25+0200\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
@@ -18,38 +18,45 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-1: lang\n"
 
 #: includes/pagetemplater/pagetemplater.php:73
-msgid "Ressources home page"
-msgstr "Accueil"
+msgid "Workshops list"
+msgstr "Liste d'ateliers"
 
-#: sagesses-ressources.php:83 sagesses-ressources.php:116
+#: includes/pagetemplater/pagetemplater.php:74
+msgid "Sessions list"
+msgstr "Liste de séances"
+
+#: sagesses-ressources.php:89 sagesses-ressources.php:131
 msgid "Select your email address"
 msgstr "Choisissez votre adresse émail"
 
-#: sagesses-ressources.php:170
+#: sagesses-ressources.php:185 sagesses-ressources.php:463
 msgid "Confirmed"
 msgstr "Confirmé"
 
-#: sagesses-ressources.php:173
+#: sagesses-ressources.php:188 sagesses-ressources.php:466
 msgid "No registered people."
 msgstr "Aucune personne inscrite."
 
-#: sagesses-ressources.php:177 sagesses-ressources.php:304
+#: sagesses-ressources.php:192 sagesses-ressources.php:344
+#: sagesses-ressources.php:470
 msgid "Date"
 msgstr "Date"
 
-#: sagesses-ressources.php:178 sagesses-ressources.php:305
+#: sagesses-ressources.php:193 sagesses-ressources.php:345
+#: sagesses-ressources.php:471
 msgid "Time"
 msgstr "Heure"
 
-#: sagesses-ressources.php:179
+#: sagesses-ressources.php:194
 msgid "Documents"
 msgstr "Documents"
 
-#: sagesses-ressources.php:183 sagesses-ressources.php:306
+#: sagesses-ressources.php:198 sagesses-ressources.php:346
+#: sagesses-ressources.php:475
 msgid "Registered people"
 msgstr "Personnes inscrites"
 
-#: sagesses-ressources.php:185
+#: sagesses-ressources.php:200 sagesses-ressources.php:477
 #, php-format
 msgid ""
 "If you are not in the list above, <a href='%s'>sign up for this workshop</a>."
@@ -57,29 +64,33 @@ msgstr ""
 "Si vous ne vous trouvez pas dans la liste ci-dessus, <a href='%s'> inscrivez-"
 "vous à cet atelier </a>."
 
-#: sagesses-ressources.php:303
+#: sagesses-ressources.php:287
 msgid "Workshop"
 msgstr "Atelier"
 
-#: sagesses-ressources.php:307
+#: sagesses-ressources.php:294
+msgid "Session"
+msgstr "Séance"
+
+#: sagesses-ressources.php:347
 msgid "Present people"
 msgstr "Personnes présentes"
 
-#: sagesses-ressources.php:316
+#: sagesses-ressources.php:356
 msgid "Past workshops"
 msgstr "Ateliers finalisés"
 
-#: sagesses-ressources.php:340
+#: sagesses-ressources.php:380
 #, php-format
 msgid "Documents of the workshop %s"
 msgstr "Documents de l'atelier %s"
 
-#: sagesses-ressources.php:351
+#: sagesses-ressources.php:391
 #, php-format
 msgid "Hi %s,"
 msgstr "Bonjour %s,"
 
-#: sagesses-ressources.php:352
+#: sagesses-ressources.php:392
 #, php-format
 msgid ""
 "here you have the documents related to the workshop '%s' you have completed "
@@ -87,11 +98,11 @@ msgid ""
 msgstr ""
 "voici les documents relatifs à l’atelier '%s' que vous avez achevé récemment."
 
-#: sagesses-ressources.php:353
+#: sagesses-ressources.php:393
 msgid "Click in the links to download the documents:"
 msgstr "Suivez les liens pour télé-charger les documents :"
 
-#: sagesses-ressources.php:355
+#: sagesses-ressources.php:395
 msgid ""
 "Copy the link and paste it in your browser if you have any problem reaching "
 "the document."
@@ -99,9 +110,12 @@ msgstr ""
 "Copiez le lien et collez-le dans votre navigateur si vous rencontrez un "
 "problème pour accéder au document."
 
-#: sagesses-ressources.php:356
+#: sagesses-ressources.php:396
 msgid "Thanks for participate in the workshop."
 msgstr "Merci beaucoup pour participer dans l'atelier."
+
+#~ msgid "Ressources home page"
+#~ msgstr "Accueil"
 
 #~ msgid "Click in the links to download the documents:."
 #~ msgstr "Suivez les liens pour télécharger les documents :"

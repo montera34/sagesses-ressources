@@ -70,7 +70,8 @@ class PageTemplater {
 
 		// Add your templates to this array.
 		$this->templates = array(
-                        'sgs-home.php'     => __('Ressources home page','sgs_ressources'),
+                        'sgs-workshops.php'     => __('Workshops list','sgs_ressources'),
+                        'sgs-seances.php'     => __('Sessions list','sgs_ressources'),
 		);
 
 	}
