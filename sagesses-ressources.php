@@ -279,19 +279,21 @@ function sgs_ressources_atelier_subscription($entry, $form) {
 add_filter('the_content','sgs_ressources_lists');
 function sgs_ressources_lists($content) {
 
+	global $workshop_pt;
+	global $seance_pt;
 	if ( is_page_template('sgs-workshops.php') ) {
-		global $workshop_pt;
 		$pt = $workshop_pt;
 		$prefix = "_atelier";
 		$class = "workshop";
 		$label = __("Workshop","sgs-ressources");
+		$label_past = __('Past workshops','sgs-ressources');
 	}
 	elseif ( is_page_template('sgs-seances.php') ) {
-		global $seance_pt;
 		$pt = $seance_pt;
 		$prefix = "_seance";
 		$class = "workshop";
 		$label = __("Session","sgs-ressources");
+		$label_past = __('Past sessions','sgs-ressources');
 	} else {
 		return $content;
 	}
@@ -299,8 +301,23 @@ function sgs_ressources_lists($content) {
 	$args = array(
 		'post_type' => $pt,
 		'posts_per_page' => -1,
-		'orderby' => 'meta_value',
-		'meta_key' => '_atelier_date'
+		//'orderby' => 'meta_value',
+		//'meta_key' => '_atelier_date'
+		'meta_query' => array(
+			'relation' => 'AND',
+			'date_clause' => array(
+				'key' => '_atelier_date',
+				'compare' => 'EXISTS',
+			),
+			'hour_clause' => array(
+				'key' => '_atelier_heure',
+				'compare' => 'EXISTS',
+			),
+		),
+		'orderby' => array(
+			'date_clause' => 'ASC',
+			'hour_clause' => 'ASC',
+		),
 	);
 	$ateliers = get_posts($args);
 	$today = date('Y-m-d');
@@ -329,7 +346,7 @@ function sgs_ressources_lists($content) {
 		} else {
 			$ap_rows .= '
 			<tr>
-				<td><a href="'.$a_perma.'">'.$a->post_title.'</a></td>
+				<td><a href="'.$a_perma.'">'.$a_name.'</a></td>
 				<td>'.$a_date.'</td>
 				<td>'.$a_time.'</td>
 				<td>'.$ar_count.'</td>
@@ -353,7 +370,7 @@ function sgs_ressources_lists($content) {
 		<tbody>'.$a_rows.'</tbody></table>
 	' : '';
 	$ap_table = ( $ap_rows != "" ) ? '
-	<h2>'.__('Past workshops','sgs-ressources').'</h2>
+	<h2>'.$label_past.'</h2>
 	<table class="'.$class.'-list '.$class.'-list-past">
 		'.$a_head.'
 		<tbody>'.$ap_rows.'</tbody></table>
