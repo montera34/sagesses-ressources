@@ -109,16 +109,15 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
  
 	if ( is_single() ) {
 		global $post;
-		global $workshop_cp;
-		global $seance_cp;
-		if ( get_post_type($post) == $workshop_cp ) $prefix = "_atelier";
+		global $workshop_pt;
+		global $seance_pt;
+		if ( get_post_type($post) == $workshop_pt ) $prefix = "_atelier";
 		else $prefix = "_seance";
 		
 		foreach ( $form['fields'] as &$field ) {
  
-			if ( $field->type != 'select' || strpos( $field->cssClass, 'populate-inscrits' ) === false ) {
-			    continue;
-			}
+			if ( $field->type != 'select' || strpos( $field->cssClass, 'populate-inscrits' ) === false )
+				continue;
  
 			$inscrits = get_post_meta($post->ID,$prefix.'_inscrits',false);
 			$inscrits_presents = get_post_meta($post->ID,$prefix.'_inscrits_presents',false);
@@ -223,9 +222,17 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 
 	global $workshop_pt;
 	global $seance_pt;
-	if ( get_post_type($post_id) == $workshop_pt ) $prefix = "_atelier";
-	else $prefix= '_seance';
+	if ( get_post_type($post_id) == $workshop_pt ) {
+		$prefix = "_atelier";
+		$pt = $workshop_pt;
+	}
+	else {
+		$prefix= '_seance';
+		$pt = $seance_pt;
+	}
+
 	$i_id = $entry['1'];
+	$i = get_user_by('id',$i_id);
 	$p = get_post( $entry['2'] );
 	$cf = get_post_meta($p->ID,$prefix.'_inscrits_presents',false);
 	if ( is_array($cf) ) $nf = array_column($cf,'ID');
@@ -235,13 +242,17 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 	$suspension_control = sgs_ressources_suspension($i,$p);
 
 	// send mail
-	if ( get_post_type($entry['2']) == $workshop_pt )
-		$send_control = sgs_ressources_send_mail($i,$p);
+	if ( get_post_type($entry['2']) == $workshop_pt || get_post_type($entry['2']) == $seance_pt && $entry['3'] == '1' )
+		$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
 	else $send_control = 1;
 
-	if ( $send_control != 1 || $suspension_control != 1 ) {
-		echo "Error: no mail sent or suspension subscription failed. Try again."; return;
-	} else {
+	if ( $send_control != 1 ) {
+		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
+	}
+	elseif ( $suspension_control != 1 ) {
+		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
+	}
+	else {
 		update_post_meta($p->ID, $prefix.'_inscrits_presents', $nf );
 		return;
 	}
@@ -249,6 +260,7 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 
 // DO NEW SUBSCIPTION
 // to a workshop
+// or seance
 // https://docs.gravityforms.com/gform_after_submission/#1-update-post
 add_action("gform_after_submission_2", "sgs_ressources_atelier_subscription", 99, 2);
 add_action("gform_after_submission_4", "sgs_ressources_atelier_subscription", 99, 2);
@@ -382,7 +394,7 @@ function sgs_ressources_lists($content) {
 
 // SEND WORKSHOP INFO BY MAIL
 // to people registered to workshop
-function sgs_ressources_send_mail($user,$workshop) {
+function sgs_ressources_send_mail($user,$post,$pt,$cf) {
 	$nl = "\r\n\r\n";
 
 	// headers
@@ -390,13 +402,15 @@ function sgs_ressources_send_mail($user,$workshop) {
 	$headers[] = "From: ".$from_name." <ressources@activezvosressources.tools>".$nl;
 	$replyto_name = 'Sagesses';
 	$headers[] = "Reply-To: ".$replyto_name." <info@activezvosressources.tools>".$nl;
-
+	
 	// to
 	$to = $user->user_email;
+	
 	// subject
-	$subject = sprintf(__('Documents of the workshop %s','sgs-ressources'),$workshop->post_title);
+	$subject = sprintf(__('Documents of the workshop %s','sgs-ressources'),$post->post_title);
+	
 	// body
-	$a_docs = get_post_meta($workshop->ID,'_atelier_documents',false);
+	$a_docs = get_post_meta($post->ID,$cf,false);
 	$a_docs_out = "";
 	$count = 0;
 	foreach ( $a_docs as $d ) {
@@ -406,8 +420,8 @@ function sgs_ressources_send_mail($user,$workshop) {
 		$a_docs_out .= $count."/ ".$d_title.": ".$d_archive['guid'].$nl;
 	}
 	$body = sprintf(__("Hi %s,","sgs-ressources"),$user->display_name).$nl;
-	$body .= sprintf(__("here you have the documents related to the workshop '%s' you have completed recently.","sgs-ressources"),$workshop->post_title).$nl;
-	$body .= sprintf(__("Click in the links to download the documents:","sgs-ressources"),$workshop->post_title).$nl;
+	$body .= sprintf(__("here you have the documents related to the workshop '%s' you have completed recently.","sgs-ressources"),$post->post_title).$nl;
+	$body .= sprintf(__("Click in the links to download the documents:","sgs-ressources"),$post->post_title).$nl;
 	$body .= $a_docs_out.$nl;
 	$body .= __("Copy the link and paste it in your browser if you have any problem reaching the document.","sgs-ressources").$nl;
 	$body .= __("Thanks for participate in the workshop.","sgs-ressources").$nl;
