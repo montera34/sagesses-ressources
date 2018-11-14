@@ -13,10 +13,15 @@
 	padding: 20px;
 }
 .gform_wrapper {
-	background-color: #f2f2f2;
 	padding: 20px;
 }
 .gform_footer p {
 	margin: 0;
 	height: 0;
+}
+.signup_form_wrapper {
+	background-color: #d1ecf1;
+}
+.confirmation_form_wrapper {
+	background-color: #f2f2f2;
 }

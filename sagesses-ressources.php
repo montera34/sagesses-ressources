@@ -142,8 +142,8 @@ function sgs_ressources_gform_populate_inscrits( $form ) {
 // + subscription form
 // https://docs.gravityforms.com/embedding-a-form/
 add_filter('the_content','sgs_ressources_atelier_add_extra_data',5);
-add_filter('the_content','sgs_ressources_atelier_subscription_form',10);
-add_filter('the_content','sgs_ressources_atelier_add_form',7);
+add_filter('the_content','sgs_ressources_atelier_subscription_form',7);
+add_filter('the_content','sgs_ressources_atelier_add_form',10);
 function sgs_ressources_atelier_add_form($content) {
 	global $post;
 	global $workshop_pt;
@@ -461,8 +461,8 @@ function sgs_ressources_suspension($user,$post) {
 // + subscription form
 // https://docs.gravityforms.com/embedding-a-form/
 add_filter('the_content','sgs_ressources_seance_add_extra_data',5);
-add_filter('the_content','sgs_ressources_seance_subscription_form',10);
-add_filter('the_content','sgs_ressources_seance_add_form',7);
+add_filter('the_content','sgs_ressources_seance_subscription_form',7);
+add_filter('the_content','sgs_ressources_seance_add_form',10);
 function sgs_ressources_seance_add_form($content) {
 	global $post;
 	global $seance_pt;
