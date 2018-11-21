@@ -58,12 +58,16 @@ function sgs_ressourcesset_default_user_config( $user_id ) {
 // with users with subscriber role
 add_filter( 'gform_pre_render_2', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_pre_render_4', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_pre_render_5', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_pre_validation_2', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_pre_validation_4', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_pre_validation_5', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_pre_submission_filter_2', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_pre_submission_filter_4', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_pre_submission_filter_5', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_admin_pre_render_2', 'sgs_ressources_gform_populate_users_subscribers' );
 add_filter( 'gform_admin_pre_render_4', 'sgs_ressources_gform_populate_users_subscribers' );
+add_filter( 'gform_admin_pre_render_5', 'sgs_ressources_gform_populate_users_subscribers' );
 function sgs_ressources_gform_populate_users_subscribers( $form ) {
  
 	if ( is_single() ) {
@@ -147,7 +151,8 @@ add_filter('the_content','sgs_ressources_atelier_add_form',10);
 function sgs_ressources_atelier_add_form($content) {
 	global $post;
 	global $workshop_pt;
-	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
+	
+	if ( get_post_type($post) != $workshop_pt || !is_single() || get_post_meta($post->ID,'_atelier_simpleform',true) == 1 ) return $content;
 
 	$content .= gravity_form( '1', true, true, false, null, false, '', false );
 
@@ -208,7 +213,11 @@ function sgs_ressources_atelier_subscription_form($content) {
 	global $workshop_pt;
 	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
 
-	$content .= gravity_form( '2', true, true, false, null, false, '', false );
+	if ( get_post_meta($post->ID,'_atelier_simpleform',true) == 1 )
+		$form_id = '5';
+	else 
+		$form_id = '2';
+	$content .= gravity_form( $form_id, true, true, false, null, false, '', false );
 
 	return $content;
 
@@ -257,6 +266,62 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 		return;
 	}
 }
+
+add_action("gform_after_submission_5", "sgs_ressources_atelier_inscrits_presents_update_simpleform", 10, 2);
+function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $form) {
+
+	global $workshop_pt;
+	global $seance_pt;
+	if ( get_post_type($post_id) == $workshop_pt ) {
+		$prefix = "_atelier";
+		$pt = $workshop_pt;
+	}
+	else {
+		$prefix= '_seance';
+		$pt = $seance_pt;
+	}
+
+	if ( $entry['8'] == 'Oui' ) {
+		$i_email = $entry['4'];
+		$i = get_user_by('email',$i_email);
+		$i_id = $i->ID;
+	}
+	else {
+		$i_id = $entry['7'];
+		$i = get_user_by('id',$i_id);
+	}
+
+
+	$p = get_post( $entry['9'] );
+	$inscrits = get_post_meta($p->ID,$prefix.'_inscrits',false);
+	$presents = get_post_meta($p->ID,$prefix.'_inscrits_presents',false);
+	if ( is_array($inscrits) ) $inscrits_new = array_column($inscrits,'ID');
+	if ( is_array($presents) ) $presents_new = array_column($presents,'ID');
+	$inscrits_new[] = $i_id;
+	$presents_new[] = $i_id;
+
+	// subscription to suspension
+	$suspension_control = sgs_ressources_suspension($i,$p);
+
+	// send mail
+	if ( get_post_type($entry['9']) == $workshop_pt || get_post_type($entry['9']) == $seance_pt && $entry['3'] == '1' ) {
+		$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
+	}
+	else { $send_control = 1; }
+
+	if ( $send_control != 1 ) {
+		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
+	}
+	elseif ( $suspension_control != 1 ) {
+		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
+	}
+	else {
+		update_post_meta($p->ID, $prefix.'_inscrits', $inscrits_new );
+		update_post_meta($p->ID, $prefix.'_inscrits_presents', $presents_new );
+		return;
+	}
+}
+
 
 // DO NEW SUBSCIPTION
 // to a workshop
