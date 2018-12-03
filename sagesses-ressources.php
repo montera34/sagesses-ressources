@@ -45,7 +45,7 @@ function sgs_ressources_register_load_styles() {
 add_action( 'user_register', 'sgs_ressourcesset_default_user_config' );
 function sgs_ressourcesset_default_user_config( $user_id ) {
 	$user = get_userdata( $user_id );
-	$name = sprintf( '%s %s', $user->first_name, $user->last_name );
+	$name = ( $user->firs_name == '' && $user->last_name == '' ) ? $user->username : sprintf( '%s %s', $user->first_name, $user->last_name );
 	$args = array(
 		'ID' => $user_id,
 		'display_name' => $name,
@@ -87,7 +87,8 @@ function sgs_ressources_gform_populate_users_subscribers( $form ) {
 		$choices = array();
  
 		foreach ( $users as $u ) {
-			$choices[] = array( 'text' => $u->display_name.' ('.$u->user_email.')', 'value' => $u->ID );
+			$text = ( $u->display_name != '' ) ? $u->display_name : $u->username;
+			$choices[] = array( 'text' => $text.' ('.$u->user_email.')', 'value' => $u->ID );
 		}
  
 		$field->placeholder = __('Select your email address','sgs-ressources');
@@ -231,6 +232,9 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 
 	global $workshop_pt;
 	global $seance_pt;
+	// $entry['1'] user id
+	// $entry['2'] post id, atelier or seance
+	//
 	if ( get_post_type($post_id) == $workshop_pt ) {
 		$prefix = "_atelier";
 		$pt = $workshop_pt;
@@ -272,6 +276,10 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 
 	global $workshop_pt;
 	global $seance_pt;
+	// $entry['9'] post id, atelier or seance
+	// $entry['7'] user id
+	// $entry['4'] user id
+	// $entry['8'] premier atelier. Oui/Non
 	if ( get_post_type($post_id) == $workshop_pt ) {
 		$prefix = "_atelier";
 		$pt = $workshop_pt;
@@ -333,6 +341,9 @@ function sgs_ressources_atelier_subscription($entry, $form) {
 
 	global $workshop_pt;
 	global $seance_pt;
+	// $entry['9'] post id, atelier or seance
+	// $entry['7'] user id
+	// $entry['4'] user id
 	if ( get_post_type($entry['9']) == $workshop_pt ) $prefix = "_atelier";
 	else $prefix= '_seance';
 	if ( $entry['7'] != '' ) {
