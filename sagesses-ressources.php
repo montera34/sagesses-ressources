@@ -253,22 +253,20 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 
 	// subscription to suspension
 	$suspension_control = sgs_ressources_suspension($i,$p);
+	if ( $suspension_control != 1 ) {
+		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
+	}
 
 	// send mail
 	if ( get_post_type($entry['2']) == $workshop_pt || get_post_type($entry['2']) == $seance_pt && $entry['3'] == '1' )
 		$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
 	else $send_control = 1;
-
 	if ( $send_control != 1 ) {
 		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
 	}
-	elseif ( $suspension_control != 1 ) {
-		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
-	}
-	else {
-		update_post_meta($p->ID, $prefix.'_inscrits_presents', $nf );
-		return;
-	}
+
+	update_post_meta($p->ID, $prefix.'_inscrits_presents', $nf );
+	return;
 }
 
 add_action("gform_after_submission_5", "sgs_ressources_atelier_inscrits_presents_update_simpleform", 10, 2);
@@ -313,9 +311,10 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 	if ( $suspension_control != 1 ) {
 		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
 	}
-
+	
 	// send mail
 	$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
+	$send_control = 1;
 	if ( $send_control != 1 ) {
 		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
 	}
@@ -509,20 +508,11 @@ function sgs_ressources_suspension($user,$post) {
 		return 1;
 	 
 	$settings = (array) get_option('sgs_emails_settings');
-	if ( array_search($user->user_email,$settings['sgs_emails_settings_addresses']) === FALSE ) {
-		$a = 0;
-		while ( $a < count($settings['sgs_emails_settings_addresses']) - 1 ) {
-			if ( $settings['sgs_emails_settings_addresses'][$a] == '') {
-				$settings['sgs_emails_settings_addresses'][$a] = $user->user_email;
-				break;
-			}
-			$a++;
-		}
-		return update_option('sgs_emails_settings',$settings);
-	} else {
-		// the address is already subscribed to suspension
-		return 1;
-	}
+	$addresses = array_values(array_filter($settings['sgs_emails_settings_addresses']));
+	if ( array_search($user->user_email,$addresses) === FALSE )
+		$addresses[] = $user->user_email;
+	$settings['sgs_emails_settings_addresses'] = $addresses;
+	return update_option('sgs_emails_settings',$settings);
 }
 
 // ADD EXTRA CONTENT TO SEANCE SINGLE
