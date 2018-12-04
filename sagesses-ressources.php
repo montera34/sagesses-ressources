@@ -234,7 +234,7 @@ function sgs_ressources_atelier_inscrits_presents_update($entry, $form) {
 	global $seance_pt;
 	// $entry['1'] user id
 	// $entry['2'] post id, atelier or seance
-	//
+	
 	if ( get_post_type($post_id) == $workshop_pt ) {
 		$prefix = "_atelier";
 		$pt = $workshop_pt;
@@ -310,24 +310,19 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 
 	// subscription to suspension
 	$suspension_control = sgs_ressources_suspension($i,$p);
+	if ( $suspension_control != 1 ) {
+		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
+	}
 
 	// send mail
-	if ( get_post_type($entry['9']) == $workshop_pt || get_post_type($entry['9']) == $seance_pt && $entry['3'] == '1' ) {
-		$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
-	}
-	else { $send_control = 1; }
-
+	$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
 	if ( $send_control != 1 ) {
 		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
 	}
-	elseif ( $suspension_control != 1 ) {
-		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
-	}
-	else {
-		update_post_meta($p->ID, $prefix.'_inscrits', $inscrits_new );
-		update_post_meta($p->ID, $prefix.'_inscrits_presents', $presents_new );
-		return;
-	}
+
+	update_post_meta($p->ID, $prefix.'_inscrits', $inscrits_new );
+	update_post_meta($p->ID, $prefix.'_inscrits_presents', $presents_new );
+	return;
 }
 
 
