@@ -12,10 +12,14 @@ Domain Path: /lang/
 
 // VARIABLES
 // TODO: to include in plugin config page in dashboard
+// Custom post types
 $workshop_pt = 'atelier';
 $seance_pt = 'seance';
+// taxonomies and terms
 $type_tx = 'type';
-
+$type_tx_intelligence_corps = '4';
+// custom fields
+$cf_a_users_confirmed = '_atelier_inscrits_presents';
 
 // PAGE TEMPLATES CREATOR
 // to add more templates edit pagetemplater, around line 72
@@ -459,6 +463,51 @@ function sgs_ressources_lists($content) {
 	' : '';
 
 	$content .= $a_table.$ap_table;
+	return $content;
+}
+
+// PRODUCE USERS LIST
+// to include it in any page
+add_filter('the_content','sgs_users_lists');
+function sgs_users_lists($content) {
+
+	if ( !is_page_template('sgs-users-list.php') )
+		return $content;
+
+	global $workshop_pt, $type_tx, $cf_a_users_confirmed, $cf_a_users_confirmed, $type_tx_intelligence_corps;
+
+	$pt = $workshop_pt;
+	$prefix = "_atelier";
+	$class = "users-list";
+	$label = __("Users that have completed Intelligence du corps et du souffle workshop","sgs-ressources");
+	$cf = $cf_a_users_confirmed;
+
+	$users_mails = array();
+	$args = array(
+		'post_type' => $pt,
+		'posts_per_page' => -1,
+		'tax_query' => array(
+			array(
+				'taxonomy' => $type_tx,
+				'field' => 'term_id',
+				'terms' => $type_tx_intelligence_corps
+			),
+		)
+	);
+	$ateliers = get_posts($args);
+	foreach ( $ateliers as $a ) {
+		$a_inscrits = get_post_meta($a->ID, $cf, false);
+		$users_mails = array_merge( $users_mails,wp_list_pluck($a_inscrits,'user_email') );
+	}
+	$users_mails = array_unique($users_mails);
+	$users_list_out = 
+		'<h2>'.$label.'</h2>
+		<div class="'.$class.'">
+			'.implode(', ',$users_mails).'
+		</div>
+	';
+
+	$content .= $users_list_out;
 	return $content;
 }
 

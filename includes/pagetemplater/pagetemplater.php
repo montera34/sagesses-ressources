@@ -72,6 +72,7 @@ class PageTemplater {
 		$this->templates = array(
                         'sgs-workshops.php'     => __('Workshops list','sgs_ressources'),
                         'sgs-seances.php'     => __('Sessions list','sgs_ressources'),
+                        'sgs-users-list.php'     => __('Users list','sgs_ressources'),
 		);
 
 	}
