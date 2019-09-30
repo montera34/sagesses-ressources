@@ -18,6 +18,8 @@ $seance_pt = 'seance';
 // taxonomies and terms
 $type_tx = 'type';
 $type_tx_intelligence_corps = '4';
+$serie_tx = 'serie';
+$edition_tx = 'edition';
 // custom fields
 $cf_a_users_confirmed = '_atelier_inscrits_presents';
 
@@ -165,8 +167,8 @@ function sgs_ressources_atelier_add_form($content) {
 }
 
 function sgs_ressources_atelier_add_extra_data($content) {
-	global $post;
-	global $workshop_pt;
+	global $post, $workshop_pt, $serie_tx;
+
 	if ( get_post_type($post) != $workshop_pt || !is_single() ) return $content;
 
 	$a_perma = get_permalink($post->ID);
@@ -195,19 +197,50 @@ function sgs_ressources_atelier_add_extra_data($content) {
 		}
 	}
 	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : __('No registered people.','sgs-ressources');
-
+	// serie
+	$series = get_the_terms($post->ID,$serie_tx);
+	if ( $series != false || is_wp_error($series) )
+		foreach ( $series as $s ) {
+			$args = array(
+				'post_type' => $workshop_pt,
+				'post__not_in' => array($post->ID),
+				'tax_query' => array(
+					array(
+						'taxonomy' => $serie_tx,
+						'field' => 'slug',
+						'terms' => $s->slug
+					)
+				)
+			);
+		}
+	$serie_workshops = get_posts($args);
+	if ( array_key_exists('ID',$serie_workshops[0]) ) {
+		$sw_list = array();
+		foreach ( $serie_workshops as $sw ) {
+			$sw_tit = get_the_title($sw);
+			$sw_perma = get_permalink($sw);
+			$sw_date = get_post_meta($sw->ID,'_atelier_date',true);
+			$sw_time = get_post_meta($sw->ID,'_atelier_heure',true);
+			$sw_time_end = get_post_meta($sw->ID,'_atelier_heure_fin',true);
+			$sw_list[] = '<a href="'.$sw_perma.'">'.$sw_tit.'</a> ('.$sw_date.' <em>'.$sw_time.' &dash; '.$sw_time_end.'</em>)';
+		}
+		$serie_workshops_out = '<dt>'.__("This workshop is part of a serie. Here the the rest of the workshops of the serie","sgs-ressources").'</dt><dd>'.implode('<br>',$sw_list).'</dd>';
+	}
+	else {
+		$serie_workshops_out = '';
+	}
 	$a_meta = '
 	<dl class="workshop workshop-meta">
 		<dt>'.__("Date","sgs-ressources").'</dt><dd>'.$a_date.'</dd>
 		<dt>'.__("Time","sgs-ressources").'</dt><dd>'.$a_time.' &dash; '.$a_time_end.'</dd>
 		<dt>'.__("Documents","sgs-ressources").'</dt><dd>'.$a_docs_list.'</dd>
+		'.$serie_workshops_out.'
 	</dl>
 	';
+	$ar_warning = ( get_post_meta($post->ID,'_atelier_simpleform',true) != 1 ) ? '<p class="alert-warning">'.sprintf(__("If you are not in the list above, <a href='%s'>sign up for this workshop</a>.","sgs-ressources"),$a_signup_form_perma).'</p>' : '';
 	$ar_out = '
 	<h2>'.__("Registered people","sgs-ressources").'</h2>'
-	.$ar_list.
-	'<p class="alert-warning">'.sprintf(__("If you are not in the list above, <a href='%s'>sign up for this workshop</a>.","sgs-ressources"),$a_signup_form_perma).'</p>
-	';
+	.$ar_list.$ar_warning;
 	$content = $a_meta.$content.$ar_out;
 
 	return $content;
