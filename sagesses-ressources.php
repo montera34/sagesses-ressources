@@ -20,6 +20,7 @@ $type_tx = 'type';
 $type_tx_intelligence_corps = '4';
 $serie_tx = 'serie';
 $edition_tx = 'edition';
+$edition_tx_last = '2019-2020';
 // custom fields
 $cf_a_users_confirmed = '_atelier_inscrits_presents';
 
@@ -184,7 +185,7 @@ function sgs_ressources_atelier_add_extra_data($content) {
 		$d_archive = get_post_meta($d['ID'],'_doc_archive',true);
 		$ad_items[] = '<a href="'.$d_archive['guid'].'">'.$d_title.'</a>';
 	}
-	$a_docs_list = implode(', ',$ad_items);
+	$a_docs_list = implode('<br>',$ad_items);
 	// Registered users
 	$a_registered = get_post_meta($post->ID,'_atelier_inscrits',false);
 	$ar_count = ( $a_registered[0] === FALSE ) ? 0 : count($a_registered);
@@ -199,7 +200,7 @@ function sgs_ressources_atelier_add_extra_data($content) {
 	$ar_list = ( $ar_items != '' ) ? '<ol>'.$ar_items.'</ol>' : __('No registered people.','sgs-ressources');
 	// serie
 	$series = get_the_terms($post->ID,$serie_tx);
-	if ( $series != false || is_wp_error($series) )
+	if ( $series !== false || is_wp_error($series) ) {
 		foreach ( $series as $s ) {
 			$args = array(
 				'post_type' => $workshop_pt,
@@ -213,18 +214,22 @@ function sgs_ressources_atelier_add_extra_data($content) {
 				)
 			);
 		}
-	$serie_workshops = get_posts($args);
-	if ( array_key_exists('ID',$serie_workshops[0]) ) {
-		$sw_list = array();
-		foreach ( $serie_workshops as $sw ) {
-			$sw_tit = get_the_title($sw);
-			$sw_perma = get_permalink($sw);
-			$sw_date = get_post_meta($sw->ID,'_atelier_date',true);
-			$sw_time = get_post_meta($sw->ID,'_atelier_heure',true);
-			$sw_time_end = get_post_meta($sw->ID,'_atelier_heure_fin',true);
-			$sw_list[] = '<a href="'.$sw_perma.'">'.$sw_tit.'</a> ('.$sw_date.' <em>'.$sw_time.' &dash; '.$sw_time_end.'</em>)';
+		$serie_workshops = get_posts($args);
+		if ( array_key_exists('ID',$serie_workshops[0]) ) {
+			$sw_list = array();
+			foreach ( $serie_workshops as $sw ) {
+				$sw_tit = get_the_title($sw);
+				$sw_perma = get_permalink($sw);
+				$sw_date = get_post_meta($sw->ID,'_atelier_date',true);
+				$sw_time = get_post_meta($sw->ID,'_atelier_heure',true);
+				$sw_time_end = get_post_meta($sw->ID,'_atelier_heure_fin',true);
+				$sw_list[] = '<a href="'.$sw_perma.'">'.$sw_tit.'</a> ('.$sw_date.' <em>'.$sw_time.' &dash; '.$sw_time_end.'</em>)';
+			}
+			$serie_workshops_out = '<dt>'.__("This workshop is part of a serie. Here the the rest of the workshops of the serie","sgs-ressources").'</dt><dd>'.implode('<br>',$sw_list).'</dd>';
 		}
-		$serie_workshops_out = '<dt>'.__("This workshop is part of a serie. Here the the rest of the workshops of the serie","sgs-ressources").'</dt><dd>'.implode('<br>',$sw_list).'</dd>';
+		else {
+			$serie_workshops_out = '';
+		}
 	}
 	else {
 		$serie_workshops_out = '';
@@ -398,8 +403,7 @@ function sgs_ressources_atelier_subscription($entry, $form) {
 add_filter('the_content','sgs_ressources_lists');
 function sgs_ressources_lists($content) {
 
-	global $workshop_pt;
-	global $seance_pt;
+	global $workshop_pt, $seance_pt, $edition_tx, $edition_tx_last;
 	if ( is_page_template('sgs-workshops.php') ) {
 		$pt = $workshop_pt;
 		$prefix = "_atelier";
@@ -420,8 +424,6 @@ function sgs_ressources_lists($content) {
 	$args = array(
 		'post_type' => $pt,
 		'posts_per_page' => -1,
-		//'orderby' => 'meta_value',
-		//'meta_key' => '_atelier_date'
 		'meta_query' => array(
 			'relation' => 'AND',
 			'date_clause' => array(
@@ -432,6 +434,13 @@ function sgs_ressources_lists($content) {
 				'key' => '_atelier_heure',
 				'compare' => 'EXISTS',
 			),
+		),
+		'tax_query' => array(
+			array(
+				'taxonomy' => $edition_tx,
+				'field' => 'slug',
+				'terms' => $edition_tx_last
+			)
 		),
 		'orderby' => array(
 			'date_clause' => 'ASC',
