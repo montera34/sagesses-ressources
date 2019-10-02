@@ -320,6 +320,7 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 	// $entry['7'] user id
 	// $entry['4'] user id
 	// $entry['8'] premier atelier. Oui/Non
+
 	if ( get_post_type($post_id) == $workshop_pt ) {
 		$prefix = "_atelier";
 		$pt = $workshop_pt;
@@ -333,12 +334,12 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 		$i_email = $entry['4'];
 		$i = get_user_by('email',$i_email);
 		$i_id = $i->ID;
+
 	}
 	else {
 		$i_id = $entry['7'];
 		$i = get_user_by('id',$i_id);
 	}
-
 
 	$p = get_post( $entry['9'] );
 	$inscrits = get_post_meta($p->ID,$prefix.'_inscrits',false);
@@ -353,10 +354,9 @@ function sgs_ressources_atelier_inscrits_presents_update_simpleform($entry, $for
 	if ( $suspension_control != 1 ) {
 		echo __('Error: suscription to suspension failed. Try again.','sgs-ressources'); return;
 	}
-	
+
 	// send mail
 	$send_control = sgs_ressources_send_mail($i,$p,$pt,$prefix.'_documents');
-	$send_control = 1;
 	if ( $send_control != 1 ) {
 		echo __('Error: no mail sent. Try again.','sgs-ressources'); return;
 	}
@@ -603,7 +603,8 @@ function sgs_ressources_suspension($user,$post) {
 	if ( array_search($user->user_email,$addresses) === FALSE )
 		$addresses[] = $user->user_email;
 	$settings['sgs_emails_settings_addresses'] = $addresses;
-	return update_option('sgs_emails_settings',$settings);
+	update_option('sgs_emails_settings',$settings);
+	return update_user_meta( $user->ID,'user_suspension',1);
 }
 
 // ADD EXTRA CONTENT TO SEANCE SINGLE
